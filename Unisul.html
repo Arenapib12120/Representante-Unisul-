@@ -545,44 +545,77 @@ const MARCAS_PG = [
 const MARCAS_HK = ['Loctite'];
 
 const BASE_CLIENTS = [
-  {id:1, name:"ALESSANDRA FERNANDES LIMA",        address:"TV. MARQUES DE BARBACENA 348",         city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA"},
-  {id:2, name:"BENEDITO ALVES DA SILVA",           address:"LOT. ALTO DA ALIANCA 187 AYRTO SENA", city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA"},
-  {id:6, name:"GILBERTO JOSE DA SILVA",            address:"R. ANDRE REBOUCAS 313",               city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA"},
-  {id:7, name:"JOAQUINA RUFINA DE CARVALHO",       address:"AV IRMA DULCE 690 TERREO",            city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA"},
-  {id:8, name:"LEONARDO ALVES DE AZEVEDO",         address:"TV. BENTO GONCALVES 338",             city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA", cod:"1185301"},
-  {id:9, name:"LUZINETE BALDO NUNES ME",           address:"AV IRMA DULCE 360",                   city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA", cod:"1009337"},
-  {id:11,name:"NOEMI DOS SANTOS LIMA SILVA",       address:"R. MARQUES DE BARBACENA 16",          city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA", cod:"1185301"},
-  {id:12,name:"RITA FERNANDES DA SILVA",           address:"R MARQUES DE BARBACENA 40 A",         city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA"},
-  {id:13,name:"GILSON OLIVEIRA",                   address:"R. SAUL ROSA SN",                     city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA"},
-  {id:14,name:"ADEONY MARQUES MANGUEIRA LTDA",     address:"LOTEAMENTO ALTO DA ALIANCA 431",      city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA", cod:"1032795"},
-  {id:15,name:"GILMAAC SANTOS DE OLIVEIRA",        address:"LOT. ALTO DA ALIANCA 219",            city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA"},
-  {id:16,name:"ROBEVALDO RIBEIRO RODRIGUES",       address:"R. ANDRE REBOUCAS 197",               city:"JUAZEIRO", bairro:"ALTO DA ALIANÇA"},
-  {id:20,name:"NILTON CESAR RIBEIRO FILHO",        address:"ARGEMIRO",                            city:"JUAZEIRO", bairro:"ARGEMIRO", cod:"1089143"},
-  {id:21,name:"LINDALVA ARAUJO CARVALHO",          address:"ARGEMIRO",                            city:"JUAZEIRO", bairro:"ARGEMIRO", cod:"1040580"},
-  {id:22,name:"JOSE FERREIRA DE JESUS",            address:"ARGEMIRO",                            city:"JUAZEIRO", bairro:"ARGEMIRO", cod:"1098892"},
-  {id:23,name:"EDNA MARIA DA SILVA",               address:"ARGEMIRO",                            city:"JUAZEIRO", bairro:"ARGEMIRO", cod:"1181809"},
-  {id:24,name:"ANDRO LUIZ DE CASTRO",              address:"ARGEMIRO",                            city:"JUAZEIRO", bairro:"ARGEMIRO", cod:"1064591"},
-  {id:26,name:"GAMA COM PRODUTOS ALIMENTICIOS",    address:"DOM JOSE RODRIGUES",                  city:"JUAZEIRO", bairro:"DOM JOSÉ RODRIGUES", cod:"1084160"},
-  {id:5, name:"DURVAL JACOBINA DE BRITO ME",       address:"R PRIMAVERA 02 CASA",                 city:"JUAZEIRO", bairro:"JARDIM PRIMAVERA", cod:"1009033"},
-  {id:10,name:"MERC PRIMAVERA DO VALE",            address:"R. PRIMAVERA 02 TERREO",              city:"JUAZEIRO", bairro:"JARDIM PRIMAVERA", cod:"1088835"},
-  {id:29,name:"JULIO CESAR PEREIRA NASCIMENTO ME", address:"JOAO XXIII",                          city:"JUAZEIRO", bairro:"JOÃO XXIII", cod:"1018552"},
-  {id:30,name:"FABIANO DA SILVA RIBEIRO",          address:"JOAO XXIII",                          city:"JUAZEIRO", bairro:"JOÃO XXIII", cod:"1038684"},
-  {id:31,name:"D. F. DA SILVA COMERCIO ME",        address:"JOAO XXIII",                          city:"JUAZEIRO", bairro:"JOÃO XXIII", cod:"1017536"},
-  {id:32,name:"ANDRO L. DE CASTRO LTDA",           address:"NOSSA SENHORA",                       city:"JUAZEIRO", bairro:"NOSSA SENHORA", cod:"1186482"},
-  {id:33,name:"JUNIOR CESAR DE MATOS",             address:"PADRE VICENTE",                       city:"JUAZEIRO", bairro:"PADRE VICENTE", cod:"1030075"},
-  {id:34,name:"PRISCILA FERNANDES",                address:"PALMARES",                            city:"JUAZEIRO", bairro:"PALMARES", cod:"1053382"},
-  {id:35,name:"ACGOD COMERCIAL LTDA",              address:"PALMARES",                            city:"JUAZEIRO", bairro:"PALMARES", cod:"1160365"},
-  {id:36,name:"MINI MERCADO TODO DIA LTDA",        address:"PEDRA DO LORDELO",                    city:"JUAZEIRO", bairro:"PEDRA DO LORDELO", cod:"1083067"},
-  {id:37,name:"PAULO GOMES ANDRADE DE JUAZEIRO",   address:"PEDRO RAIMUNDO",                      city:"JUAZEIRO", bairro:"PEDRO RAIMUNDO", cod:"1013680"},
-  {id:3, name:"DROGARIA ALMEIDA E SILVA",          address:"R. DO RISO 313 PIRANGA",              city:"JUAZEIRO", bairro:"PIRANGA"},
-  {id:4, name:"DROGARIA BARBOSA E SILVA",          address:"R DA ESTACAO 1100",                   city:"JUAZEIRO", bairro:"PIRANGA", cod:"1009030"},
-  {id:38,name:"ORJANIA MARIA DE CASTRO",           address:"PIRANGA",                             city:"JUAZEIRO", bairro:"PIRANGA", cod:"1037192"},
-  {id:40,name:"JEAN CARLOS MUNIZ DE SOUZA ME",     address:"PIRANGA I",                           city:"JUAZEIRO", bairro:"PIRANGA", cod:"1017232"},
-  {id:41,name:"FRANCISCO ANTONIO PEREIRA ME",      address:"QUIDE",                               city:"JUAZEIRO", bairro:"QUIDE", cod:"1009338"},
-  {id:42,name:"VITOR DA CRUZ SOUZA",               address:"QUIDE",                               city:"JUAZEIRO", bairro:"QUIDE", cod:"1104266"},
-  {id:25,name:"M ISABEL TEIX DO VALLE MED LTDA",   address:"REMANSO CENTRO",                      city:"JUAZEIRO", bairro:"REMANSO", cod:"1107527"},
-  {id:43,name:"ROSANA FERREIRA DA G SANTOS",       address:"SANTO ANTONIO",                       city:"JUAZEIRO", bairro:"SANTO ANTÔNIO", cod:"1105494"},
-  {id:44,name:"NADIAN S SOARES BEZERRA ME",        address:"SANTO ANTONIO",                       city:"JUAZEIRO", bairro:"SANTO ANTÔNIO", cod:"1017290"},
+  // ── JUAZEIRO ──
+  {id:1,  name:"MERCADINHO TROPICAL",             address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:2,  name:"MERCADINHO NOSSA CASA",            address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:3,  name:"EDNA MARIA DA SILVA",              address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:4,  name:"MERC. MUNIZ",                      address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:5,  name:"MERCADINHO GIRASSOL",              address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:6,  name:"MERCADINHO PORFIRIO",              address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:7,  name:"MERCADINHO ESPERANCA",             address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:8,  name:"EMPORIO MERCADINHO",               address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:9,  name:"MERCADINHO SILVA",                 address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:10, name:"GIRASSOL",                         address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:11, name:"MERCADINHO VERA",                  address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:12, name:"MERCADINHO 2 IRMAOS",              address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:13, name:"BAHIA PHARMA",                     address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:14, name:"NOSTRA CASA MERCADINHO",           address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:15, name:"MERCADINHO EDILENE 1",             address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:16, name:"DROGARIA BARBOSA",                 address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:17, name:"MERCADINHO PRIMAVERA",             address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:18, name:"GIL SUPERMERCADO",                 address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:19, name:"MERCADINHO BOMBONIERI OLIVEIRA",   address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:20, name:"MERCADINHO AVENIDA",               address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:21, name:"MERCADINHO EDILENE",               address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:22, name:"MERCADINHO SOUZA",                 address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:23, name:"MERCADINHO JARDIM PRIMAVERA",      address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:24, name:"MERCADINHO NOVA ALIANCA",          address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:25, name:"RITA FERNANDES DA SILVA DE JUAZEIRO", address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:26, name:"ROBEVALDO RIBEIRO RODRIGUES LTDA", address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:27, name:"VERDURAO AVENIDA",                 address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:28, name:"MERCADINHO E DISTR. BEBIS BEM",    address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:29, name:"COMERCIAL CASTRO",                 address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:30, name:"MERCADINHO LIMA SILVA",            address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:31, name:"MERCADINHO ANTUNES",               address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:32, name:"BUDEGA ALTAS HORAS",               address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:33, name:"FARMACIA R.DO SANTO ANTONIO",      address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:34, name:"MULTIMARCAS ALIMENTOS E PERFUMARIA",address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:35, name:"MERCADINHO BEZERRA",               address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:36, name:"DROGA RIO",                        address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:37, name:"MERCADINHO PADARIA LISBOA",        address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:38, name:"HORTIFRUTAS E COMERCIAL SOUZA",    address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:39, name:"FARMACIA REGIONAL",                address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:40, name:"SUPERMERCADO FRANGO BRILHANTE",    address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:41, name:"SUPER SACOLAO PLANALTO",           address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:42, name:"KI PAO",                           address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:43, name:"MERCADINHO XIQUE XIQUE",           address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:44, name:"MERCADINHO BRILHANTE",             address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:200,name:"MERCADINHO SAO FRANCISCO",         address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:201,name:"COMERCIAL SANTOS",                 address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:202,name:"PANIFICADORA MARINGA",             address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:203,name:"MERCADINHO BOMBARATO",             address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:204,name:"MERCADINHO TODO DIA",              address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:205,name:"MERCADINHO OLIVEIRA",              address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:206,name:"OLIVEIRO NETO MACIEL",             address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:207,name:"MERCADINHO FERNANDES",             address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:208,name:"PRISCILA OLIVEIRA",                address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:209,name:"LORD FARMA",                       address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:210,name:"SOS GELADAO",                      address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:211,name:"MERCADINHO ZIMBRO",                address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:212,name:"NJ DISTRIBUIDORA",                 address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:213,name:"MERCADINHO S2",                    address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:214,name:"MERCADINHO SACOLA CHEIA",          address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:215,name:"MERCADO JANGADEIRO",               address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:216,name:"MERCADINHO JB",                    address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:217,name:"BJ SUPERMERCADO",                  address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:218,name:"MERCADINHO EDILENE (2)",            address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:219,name:"FARMACIA MAIS BARATO",             address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:220,name:"MERCADINHO GAMA",                  address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:221,name:"IZABEL FREIRE DA CRUZ",            address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:222,name:"MERCADINHO MATOS",                 address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:223,name:"MERCADINHO GN",                    address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:224,name:"MERCADINHO VITORIA",               address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
+  {id:225,name:"PHARMIX",                          address:"JUAZEIRO", city:"JUAZEIRO", bairro:"JUAZEIRO"},
   {id:45,name:"MERCADINHO AGAVIA",                 address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
   {id:46,name:"FARMACIA TEXEIRA",                  address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
   {id:47,name:"COMERCIAL MIX OFERTAS",             address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
@@ -896,8 +929,8 @@ function renderClientCard(c, num, isDisabled) {
     <div class="card-header" onclick="toggleCard(${c.id})">
       <div class="num">${isDisabled?'🚫':num}</div>
       <div class="card-info">
-        <div class="card-name">${c.name}</div>
-        <div class="card-meta">${c.address} · ${c.city}${getC(c.id,'responsavel','')?'<br><span style="color:#059669;font-weight:800;">👤 '+getC(c.id,'responsavel','')+'</span>':''}</div>
+        <div class="card-name">${getC(c.id,"editName","")||c.name}</div>
+        <div class="card-meta">${getC(c.id,"editAddress","")||c.address} · ${c.city}${getC(c.id,'responsavel','')?'<br><span style="color:#059669;font-weight:800;">👤 '+getC(c.id,'responsavel','')+'</span>':''}</div>
       </div>
       <div class="badges">
         ${isNew?`<span class="badge badge-novo">🆕</span>`:''}
@@ -940,7 +973,7 @@ function renderClientCard(c, num, isDisabled) {
         <label class="field-label">📋 Observações gerais</label>
         <textarea oninput="setC(${c.id},'obs',this.value)" placeholder="Anotações permanentes...">${getC(c.id,'obs','')}</textarea>
       </div>
-      ${isNew?`<button class="btn-save" onclick="openEditClientModal(${c.id})" style="background:linear-gradient(135deg,#059669,#10b981);margin-bottom:8px">✏️ Editar Cadastro</button>`:''}
+      <button class="btn-save" onclick="openEditClientModal(${c.id})" style="background:linear-gradient(135deg,#059669,#10b981);margin-bottom:8px">✏️ Editar Nome/Endereço</button>
       <button class="btn-save" onclick="saveCard(${c.id})">💾 Salvar</button>
       <button class="btn-disable" onclick="disableClient(${c.id})">🚫 Desativar Cliente</button>
       ` : `
@@ -1251,13 +1284,13 @@ function openClientModal() {
   document.getElementById('clientModal').classList.add('show');
 }
 function openEditClientModal(id) {
-  const c=customClients.find(x=>x.id===id); if(!c) return;
+  const c=allClients().find(x=>x.id===id); if(!c) return;
   editingClientId=id;
   document.getElementById('clientModalTitle').textContent='✏️ Editar Cliente';
-  document.getElementById('cName').value=c.name||'';
-  document.getElementById('cAddress').value=c.address||'';
+  document.getElementById('cName').value=getC(id,'editName','')||c.name||'';
+  document.getElementById('cAddress').value=getC(id,'editAddress','')||c.address||'';
   document.getElementById('cCity').value=c.city||'';
-  document.getElementById('cBairro').value=c.bairro||'';
+  document.getElementById('cBairro').value=getC(id,'editBairro','')||c.bairro||'';
   document.getElementById('cCod').value=c.cod||'';
   document.getElementById('cPhone').value=getC(id,'phone','')||'';
   document.getElementById('cObs').value=getC(id,'obs','')||'';
@@ -1275,7 +1308,16 @@ function saveClientModal() {
   const phone=document.getElementById('cPhone').value.trim();
   const obs=document.getElementById('cObs').value.trim();
   if(editingClientId!==null) {
-    customClients=customClients.map(c=>c.id===editingClientId?{...c,name,address,city,bairro,cod}:c);
+    // Update in customClients or BASE_CLIENTS via clientData
+    const isCustom = customClients.some(c=>c.id===editingClientId);
+    if(isCustom) {
+      customClients=customClients.map(c=>c.id===editingClientId?{...c,name,address,city,bairro,cod}:c);
+    } else {
+      // Store edits for base clients in clientData
+      setC(editingClientId,'editName',name);
+      setC(editingClientId,'editAddress',address);
+      setC(editingClientId,'editBairro',bairro);
+    }
     setC(editingClientId,'phone',phone); setC(editingClientId,'obs',obs);
   } else {
     const newId=Date.now();
