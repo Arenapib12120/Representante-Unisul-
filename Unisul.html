@@ -131,6 +131,10 @@ input:focus,textarea:focus,select:focus{border-color:#1a6bbf;}
 .day-grid{display:flex;gap:6px;flex-wrap:wrap;}
 .day-btn{padding:8px 12px;border-radius:20px;border:2px solid #e2eaf5;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;background:white;color:#6b7a99;transition:all .15px;}
 .day-btn.sel{border-color:#7c3aed;background:#f5f3ff;color:#5b21b6;}
+.week-colors-1{border-color:#1a6bbf!important;background:#eff6ff!important;color:#1d4ed8!important;}
+.week-colors-2{border-color:#059669!important;background:#f0fdf4!important;color:#065f46!important;}
+.week-colors-3{border-color:#d97706!important;background:#fffbeb!important;color:#92400e!important;}
+.week-colors-4{border-color:#7c3aed!important;background:#f5f3ff!important;color:#5b21b6!important;}
 
 .edit-actions{display:flex;gap:8px;margin-bottom:10px;}
 .btn-wa-sm,.btn-map-sm{flex:1;padding:9px 0;border:none;border-radius:8px;font-family:'Nunito',sans-serif;font-weight:800;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;text-decoration:none;transition:opacity .15s;}
@@ -513,7 +517,15 @@ input:focus,textarea:focus,select:focus{border-color:#1a6bbf;}
 // ═══════════════════════════════════════
 //  CONSTANTS
 // ═══════════════════════════════════════
-const DAYS = ["Seg","Ter","Qua","Qui","Sex","Sáb"];
+const SEMANAS = ["Semana 1","Semana 2","Semana 3","Semana 4"];
+const SEMANA_ICONS = ["1️⃣","2️⃣","3️⃣","4️⃣"];
+const SEMANA_COLORS = ["#1a6bbf","#059669","#d97706","#7c3aed"];
+// Semanas por cidade: JUAZEIRO=todas, SOBRADINHO=1,2,3,4, CASA NOVA=1,3, SANTANA DO SOBRADO=1,3
+function defaultWeeksForCity(city) {
+  const c = (city||"").toUpperCase();
+  if(c.includes("CASA NOVA") || c.includes("SANTANA DO SOBRADO")) return [0,2];
+  return [0,1,2,3]; // Juazeiro, Sobradinho e outros = todas
+}
 const VISIT_STATUS = {
   vendeu:   "💰 Vendeu",
   semvenda: "📋 Sem Venda",
@@ -571,18 +583,90 @@ const BASE_CLIENTS = [
   {id:25,name:"M ISABEL TEIX DO VALLE MED LTDA",   address:"REMANSO CENTRO",                      city:"JUAZEIRO", bairro:"REMANSO", cod:"1107527"},
   {id:43,name:"ROSANA FERREIRA DA G SANTOS",       address:"SANTO ANTONIO",                       city:"JUAZEIRO", bairro:"SANTO ANTÔNIO", cod:"1105494"},
   {id:44,name:"NADIAN S SOARES BEZERRA ME",        address:"SANTO ANTONIO",                       city:"JUAZEIRO", bairro:"SANTO ANTÔNIO", cod:"1017290"},
-  {id:45,name:"VAREJAO PAGUE MENOS LTDA",          address:"SANTANA DO SUL",                      city:"CASA NOVA", bairro:"SANTANA DO SUL", cod:"1184589"},
-  {id:46,name:"VALERIA SANTOS CASTRO",             address:"JOAO E MARIA",                        city:"CASA NOVA", bairro:"JOAO E MARIA", cod:"1155433"},
-  {id:47,name:"TRES MARIAS ALIMENTOS DO VALE L",   address:"BORGES",                              city:"CASA NOVA", bairro:"BORGES", cod:"1054444"},
-  {id:48,name:"TRES MARIAS ALIMENTOS DO VALE L",   address:"CENTRO",                              city:"CASA NOVA", bairro:"CENTRO", cod:"1163733"},
-  {id:49,name:"SUPERMERCADO ANGELICA LTDA",        address:"TOPOL",                               city:"CASA NOVA", bairro:"TOPOL", cod:"1159594"},
-  {id:50,name:"PROGRESSO C.V.G. ALIMENTICIO",      address:"CENTRO",                              city:"CASA NOVA", bairro:"CENTRO", cod:"1069081"},
-  {id:51,name:"PEG ALIMENTOS LTDA",                address:"VILA AZUL",                           city:"CASA NOVA", bairro:"VILA AZUL", cod:"1035194"},
-  {id:52,name:"PEDRO FERNAND COELHO E CIA LTDA",   address:"SANTANA SOBRADINHO",                  city:"CASA NOVA", bairro:"SANTANA SOBR", cod:"1017192"},
-  {id:53,name:"MIX COELHO ATACAREJO LTDA",         address:"CENTRO",                              city:"CASA NOVA", bairro:"CENTRO", cod:"1141796"},
-  {id:54,name:"MARIA HELENA F DOS SANTOS ARAUJO",  address:"CENTRO",                              city:"CASA NOVA", bairro:"CENTRO", cod:"1018202"},
-  {id:55,name:"MARIA EDVANIA FREIRE LEAL ME",      address:"SANTANA DO SUL",                      city:"CASA NOVA", bairro:"SANTANA DO SUL", cod:"1032356"},
-  {id:56,name:"MARCELO LUIZ DE CASTRO SANTOS ME",  address:"VILA MASSU",                          city:"CASA NOVA", bairro:"VILA MASSU", cod:"1018841"},
+  {id:45,name:"MERCADINHO AGAVIA",                 address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:46,name:"FARMACIA TEXEIRA",                  address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:47,name:"COMERCIAL MIX OFERTAS",             address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:48,name:"COMERCIAL BEZERRA",                 address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:49,name:"PEREIRA SUPERMERCADO",              address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:50,name:"FARMACIA PAGUE MENOS",              address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:51,name:"FARMACIA OLIVEIRA",                 address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:52,name:"GM ALIANCA",                        address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:53,name:"FARMACIA PASSOS",                   address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:54,name:"JOSILETE DIAS DA COSTA",            address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:55,name:"MERCADINHO FREITAS",                address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:56,name:"MIX COELHO ATACAREJO",              address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:57,name:"FARMAVALLE",                        address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:58,name:"CESTAO",                            address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:59,name:"COMERCIAL ROSA",                    address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:60,name:"RUI CASTRO FILHO",                  address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:61,name:"SUPERMERCADO OLIVEIRA",             address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:62,name:"SUPERMERCADO DO VALE",              address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:63,name:"MERCADO BOM PRECO OURICURI",        address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:64,name:"COMERCIAL LEITE",                   address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:65,name:"COMERCIAL CORREIA",                 address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:66,name:"MERCADINHO SANTOS",                 address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:67,name:"FARMACIA FONSECA",                  address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:68,name:"DROGARIA RABELO",                   address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:69,name:"MERC VERD BOM PRECO",               address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:70,name:"TERRA NOVA",                        address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:71,name:"MERCADINHO OURICURI",               address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:72,name:"SUPERMERCADO VIEIRA",               address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:73,name:"BOX DO AMILTON",                    address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:74,name:"MERCADINHO SHALON",                 address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:75,name:"FARMACIA EBENEZER",                 address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:76,name:"VITORIA FARMA",                     address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:77,name:"MERCADINHO ANGELICA",               address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:78,name:"SUPERMIX",                          address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:79,name:"MERCADINHO DA VOVO",                address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  {id:80,name:"SUPERMERCADO VALLE MIX",            address:"CASA NOVA",  city:"CASA NOVA", bairro:"CASA NOVA"},
+  // ── SOBRADINHO ──
+  {id:101,name:"ANDRE ROBERTO DA SILVA",            address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:102,name:"CAPIM FRIOS LTDA",                  address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:103,name:"CICERO ROMAO DE SA",                address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:104,name:"CLAUDOMIRO A.SILVA DE SOBRADINHO ME",address:"SOBRADINHO",                         city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:105,name:"MERCADINHO ECONOMICO",              address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:106,name:"FARMACIA GAUCHINHA LTDA",           address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:107,name:"FRANCISCA MENDES DE LUCENA DE SOBRA",address:"SOBRADINHO",                        city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:108,name:"COMERCIAL SAO GABRIEL ALIMENTOS",   address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:109,name:"JOSE ADELMO DE LIMA MERCEARIA ME",  address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:110,name:"KARINE DANTAS ALVES EIRELI",        address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:111,name:"LIDIA MARIA GOMES DE MORAES",       address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:112,name:"MARIA DO SOCORRO S.DE SOBRADINHO ME",address:"SOBRADINHO",                        city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:113,name:"MARIA LEUSANETE FIGUEIROA VALENCA", address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:114,name:"MERCADINHO CANTURIL",               address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:115,name:"MERCEARIA SOUZA",                   address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:116,name:"SUPERMERCADO NOVA GERACAO",         address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:117,name:"ELIEZE PEREIRA ALVES",              address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:118,name:"MERCADINHO SANTOS",                 address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:119,name:"CESTAO DO VALE",                    address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:120,name:"MERCADINHO JUMBO",                  address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:121,name:"COMERCIAL BRITO",                   address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:122,name:"MERCADINHO SILVA",                  address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:123,name:"MERCADO ECONOMIX",                  address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:124,name:"COM. DE ALIMENTOS CANTURIL LTDA",   address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:125,name:"CRISLEIDAIANE PEREIRA DOS SANTOS",  address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:126,name:"ELIEL PEREIRA ALVES SOBRADINHO ME", address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:127,name:"ERENILDA BARBOSA ALVES CANTURIL",   address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:128,name:"FABIANA FREITAS DA SILVA SANTOS",   address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:129,name:"LENEILDO MONTEIRO DA SILVA",        address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:130,name:"MARIA DE LOURDES B.DE S.TOLENTIN ME",address:"SOBRADINHO",                        city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:131,name:"MARIA JUVONETE DO NASC.DE SOBRAD.ME",address:"SOBRADINHO",                        city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:132,name:"MARIO RAUL DA SILVA",               address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:133,name:"MECMIX COM VAR DE GENEROS ALIM LTDA",address:"SOBRADINHO",                        city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:134,name:"SUZANA PAULA O.DOS SANTOS BATIST.ME",address:"SOBRADINHO",                        city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:135,name:"COMERCIAL CENTRAL",                 address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:136,name:"SUPERMERCADO E CASA DE CARNES BRASIL",address:"SOBRADINHO",                       city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:137,name:"MERCADINHO N.S.APARECIDA",          address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:138,name:"MERCADINHO SAO VICENTE",            address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:139,name:"MERCADINHO BOMBOM E BOMBOM PECAS",  address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:140,name:"MERCADINHO LIMA",                   address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:141,name:"SUPERMERCADO PEG PAG",              address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:142,name:"PANIFICADORA MORAES",               address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:143,name:"MERCADO",                           address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:144,name:"FARMACIA VALENCA",                  address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:145,name:"O A G SERVICOS",                    address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:146,name:"COMERCIAL R.B",                     address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
+  {id:147,name:"MERCADINHO ECONOMICO (2)",          address:"SOBRADINHO",                          city:"SOBRADINHO", bairro:"SOBRADINHO"},
 ];
 
 // ═══════════════════════════════════════
@@ -593,7 +677,7 @@ let customClients = [];
 let disabledIds   = new Set();
 let visitData     = {};
 let openCardId    = null;
-let dayFilter     = -1;
+let weekFilter    = -1; // -1=todas, 0=S1, 1=S2, 2=S3, 3=S4
 let statusFilter  = 'todos';
 let editingClientId = null;
 let editingTaskId = null;
@@ -697,24 +781,26 @@ function updateMonthLabel() {
 // ═══════════════════════════════════════
 //  CLIENTS RENDER
 // ═══════════════════════════════════════
-function todayDayIndex() {
-  const jsDay = new Date().getDay();
-  return jsDay === 0 ? -1 : jsDay - 1;
+function currentWeekIndex() {
+  const day = new Date().getDate();
+  if(day <= 7)  return 0;
+  if(day <= 14) return 1;
+  if(day <= 21) return 2;
+  return 3;
 }
-const DAY_LABELS = ['Segunda','Terça','Quarta','Quinta','Sexta','Sábado'];
 
 function buildDayTabs() {
-  const today = todayDayIndex();
-  let html = `<button class="tab ${dayFilter===-1?'active':''}" onclick="setDayFilter(-1,this)">🗓️ Todos</button>`;
-  DAYS.forEach((d,i)=>{
-    const isToday = i===today;
-    html+=`<button class="tab ${dayFilter===i?'active':''}" onclick="setDayFilter(${i},this)">${isToday?'⭐ ':''} ${DAY_LABELS[i]}</button>`;
+  const curWeek = currentWeekIndex();
+  let html = `<button class="tab ${weekFilter===-1?'active':''}" onclick="setWeekFilter(-1,this)">🗓️ Todas</button>`;
+  SEMANAS.forEach((s,i)=>{
+    const isCur = i===curWeek;
+    html+=`<button class="tab ${weekFilter===i?'active':''}" onclick="setWeekFilter(${i},this)">${isCur?'⭐ ':SEMANA_ICONS[i]+' '}${s}</button>`;
   });
   document.getElementById('cityTabs').innerHTML=html;
 }
 
-function setDayFilter(d,btn) {
-  dayFilter=d;
+function setWeekFilter(w,btn) {
+  weekFilter=w;
   document.querySelectorAll('#cityTabs .tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active'); renderAll();
 }
@@ -723,7 +809,13 @@ function setFilter(f,btn) {
   document.querySelectorAll('.scroll-tabs:not(#cityTabs) .tab').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active'); renderAll();
 }
-function clientDays(id) { return getC(id,'days',[]) || []; }
+function clientWeeks(id) {
+  const saved = getC(id,'weeks',null);
+  if(saved !== null && saved !== '') return saved;
+  // default by city
+  const c = allClients().find(x=>x.id===id);
+  return c ? defaultWeeksForCity(c.city) : [0,1,2,3];
+}
 
 function renderAll() {
   buildDayTabs();
@@ -731,9 +823,9 @@ function renderAll() {
 
   const active=allClients().filter(c=>{
     if(disabledIds.has(c.id)) return false;
-    if(dayFilter!==-1) {
-      const days=clientDays(c.id);
-      if(!days.includes(dayFilter)) return false;
+    if(weekFilter!==-1) {
+      const weeks=clientWeeks(c.id);
+      if(!weeks.includes(weekFilter)) return false;
     }
     const prog=visitProgress(c.id);
     if(statusFilter==='completo' && prog<2) return false;
@@ -745,51 +837,26 @@ function renderAll() {
   });
 
   let html='';
-  if(dayFilter===-1) {
-    const sem_dia = active.filter(c=>clientDays(c.id).length===0);
-    DAYS.forEach((d,i)=>{
-      const group = active.filter(c=>clientDays(c.id).includes(i));
-      if(!group.length) return;
-      const bVisits = group.reduce((s,c)=>s+visitProgress(c.id),0);
-      const bMax    = group.length*2;
-      const isToday = i===todayDayIndex();
-      html+=`<div class="sec-header" onclick="toggleSection(this)">
-        <span class="sec-header-icon">${isToday?'⭐':'📅'}</span>
-        <span class="sec-header-text" style="${isToday?'color:#1a6bbf':''}">${DAY_LABELS[i]}${isToday?' — Hoje':''}</span>
-        <span class="sec-header-count">${bVisits}/${bMax} visitas</span>
-        <span class="sec-header-arrow open">▶</span>
-      </div><div class="section-body">`;
-      group.forEach((c,idx)=>{ html+=renderClientCard(c,idx+1,false); });
-      html+='</div>';
-    });
-    if(sem_dia.length){
-      html+=`<div class="sec-header" onclick="toggleSection(this)">
-        <span class="sec-header-icon">❓</span>
-        <span class="sec-header-text">Sem dia definido</span>
-        <span class="sec-header-count">${sem_dia.length}</span>
-        <span class="sec-header-arrow open">▶</span>
-      </div><div class="section-body">`;
-      sem_dia.forEach((c,idx)=>{ html+=renderClientCard(c,idx+1,false); });
-      html+='</div>';
-    }
-  } else {
-    const groups={};
-    active.forEach(c=>{ if(!groups[c.bairro])groups[c.bairro]=[]; groups[c.bairro].push(c); });
-    Object.entries(groups).forEach(([bairro,clients])=>{
-      const bVisits = clients.reduce((s,c)=>s+visitProgress(c.id),0);
-      const bMax    = clients.length*2;
-      html+=`<div class="sec-header" onclick="toggleSection(this)">
-        <span class="sec-header-icon">📍</span>
-        <span class="sec-header-text">${bairro}</span>
-        <span class="sec-header-count">${bVisits}/${bMax} visitas</span>
-        <span class="sec-header-arrow open">▶</span>
-      </div><div class="section-body">`;
-      clients.forEach((c,i)=>{ html+=renderClientCard(c,i+1,false); });
-      html+='</div>';
-    });
-  }
+  // Agrupar por cidade dentro da semana
+  const cityGroups={};
+  active.forEach(c=>{ const k=c.city; if(!cityGroups[k])cityGroups[k]=[]; cityGroups[k].push(c); });
+  const cityOrder = ['JUAZEIRO','SOBRADINHO','SANTANA DO SOBRADO','CASA NOVA'];
+  const allCities = [...new Set([...cityOrder.filter(x=>cityGroups[x]), ...Object.keys(cityGroups).filter(x=>!cityOrder.includes(x))])];
+  allCities.forEach(city=>{
+    const clients = cityGroups[city]; if(!clients) return;
+    const bVisits = clients.reduce((s,c)=>s+visitProgress(c.id),0);
+    const bMax    = clients.length*2;
+    html+=`<div class="sec-header" onclick="toggleSection(this)">
+      <span class="sec-header-icon">📍</span>
+      <span class="sec-header-text">${city}</span>
+      <span class="sec-header-count">${bVisits}/${bMax} visitas</span>
+      <span class="sec-header-arrow open">▶</span>
+    </div><div class="section-body">`;
+    clients.forEach((c,i)=>{ html+=renderClientCard(c,i+1,false); });
+    html+='</div>';
+  });
 
-  if(!html) html=`<div class="empty-msg">Nenhum cliente${dayFilter!==-1?' para '+DAY_LABELS[dayFilter]+' ainda.<br><small>Abra um cliente e selecione o dia da semana dele.</small>':' encontrado.'}</div>`;
+  if(!html) html=`<div class="empty-msg">Nenhum cliente${weekFilter!==-1?' para '+SEMANAS[weekFilter]:''}  encontrado.</div>`;
   document.getElementById('clientList').innerHTML=html;
 
   const disabled=allClients().filter(c=>disabledIds.has(c.id));
@@ -804,7 +871,7 @@ function renderAll() {
 function renderClientCard(c, num, isDisabled) {
   const phone = getC(c.id,'phone','');
   const time  = getC(c.id,'time','');
-  const days  = getC(c.id,'days',[]);
+  const weeks = clientWeeks(c.id);
   const isOpen= openCardId===c.id;
   const isNew = customClients.some(x=>x.id===c.id);
   const prog  = visitProgress(c.id);
@@ -830,7 +897,7 @@ function renderClientCard(c, num, isDisabled) {
       <div class="num">${isDisabled?'🚫':num}</div>
       <div class="card-info">
         <div class="card-name">${c.name}</div>
-        <div class="card-meta">${c.address} · ${c.city}</div>
+        <div class="card-meta">${c.address} · ${c.city}${getC(c.id,'responsavel','')?'<br><span style="color:#059669;font-weight:800;">👤 '+getC(c.id,'responsavel','')+'</span>':''}</div>
       </div>
       <div class="badges">
         ${isNew?`<span class="badge badge-novo">🆕</span>`:''}
@@ -860,9 +927,13 @@ function renderClientCard(c, num, isDisabled) {
         <input type="time" value="${time}" oninput="setC(${c.id},'time',this.value)">
       </div>
       <div class="field-group">
-        <label class="field-label">📅 Dias da semana</label>
+        <label class="field-label">👤 Responsável pelas compras</label>
+        <input type="text" value="${getC(c.id,'responsavel','')}" oninput="setC(${c.id},'responsavel',this.value)" placeholder="Nome de quem faz os pedidos...">
+      </div>
+      <div class="field-group">
+        <label class="field-label">📅 Semanas de visita</label>
         <div class="day-grid">
-          ${DAYS.map((d,i)=>`<button class="day-btn ${(days||[]).includes(i)?'sel':''}" onclick="toggleDay(${c.id},${i},this)">${d}</button>`).join('')}
+          ${SEMANAS.map((s,i)=>{ const ws=clientWeeks(c.id); return `<button class="day-btn ${ws.includes(i)?'sel week-colors-'+(i+1):''}" onclick="toggleWeek(${c.id},${i},this)">${s}</button>`; }).join('')}
         </div>
       </div>
       <div class="field-group">
@@ -1114,10 +1185,11 @@ function toggleSection(hdr) {
   body.style.display=isOpen?'none':''; arrow.classList.toggle('open',!isOpen);
 }
 function toggleCard(id) { openCardId=openCardId===id?null:id; renderAll(); }
-function toggleDay(id,i,btn) {
-  let days=getC(id,'days',[]);
-  days=days.includes(i)?days.filter(d=>d!==i):[...days,i];
-  setC(id,'days',days); btn.classList.toggle('sel',days.includes(i));
+function toggleWeek(id,i,btn) {
+  let weeks=[...clientWeeks(id)];
+  weeks=weeks.includes(i)?weeks.filter(w=>w!==i):[...weeks,i];
+  setC(id,'weeks',weeks);
+  btn.className='day-btn'+(weeks.includes(i)?' sel week-colors-'+(i+1):'');
 }
 function saveCard(id) { savePersist(); renderAll(); showToast(); }
 function showToast() {
@@ -1468,11 +1540,11 @@ function renderStats() {
     </div>`}
   </div>`;
 
-  const vendasPorDia = DAYS.map((_,di)=>{
+  const vendasPorSemana = SEMANAS.map((s,si)=>{
     let total=0, count=0;
     clients.forEach(c=>{
-      const days=clientDays(c.id);
-      if(!days.includes(di)) return;
+      const weeks=clientWeeks(c.id);
+      if(!weeks.includes(si)) return;
       [1,2].forEach(n=>{
         const v=getVisitForMonth(c.id,n,mk);
         if(v.status==='vendeu'){
@@ -1481,18 +1553,17 @@ function renderStats() {
         }
       });
     });
-    return {dia:DAY_LABELS[di], total, count};
+    return {sem:s, total, count};
   });
-  const maxVenda = Math.max(...vendasPorDia.map(v=>v.total), 1);
-  const diaColors = ['#1a6bbf','#7c3aed','#059669','#d97706','#ef4444','#0ea5e9'];
+  const maxVenda = Math.max(...vendasPorSemana.map(v=>v.total), 1);
   const vendasDiaHtml = `
   <div class="stats-section">
-    <div class="stats-section-title">💰 Vendas por Dia da Semana</div>
+    <div class="stats-section-title">💰 Vendas por Semana</div>
     <div class="bar-chart">
-      ${vendasPorDia.map((v,i)=>`
+      ${vendasPorSemana.map((v,i)=>`
       <div class="bar-row">
-        <div class="bar-label">${v.dia.slice(0,3)}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${v.total/maxVenda*100}%;background:${diaColors[i]}">${v.count>0?v.count+'x':''}</div></div>
+        <div class="bar-label" style="font-size:10px">${v.sem}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${v.total/maxVenda*100}%;background:${SEMANA_COLORS[i]}">${v.count>0?v.count+'x':''}</div></div>
         <div class="bar-value" style="font-size:10px">${v.total>0?'R$'+v.total.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}):'—'}</div>
       </div>`).join('')}
     </div>
@@ -1568,8 +1639,7 @@ const d=new Date();
 document.getElementById('headerSub').textContent=
   d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,x=>x.toUpperCase());
 
-const _td = todayDayIndex();
-if(_td >= 0) dayFilter = _td;
+weekFilter = currentWeekIndex();
 
 buildDayTabs(); populateClientSelect(); renderAll(); renderTasks(); updateTaskBadge(); scheduleAllAlarms();
 if(window.Notification&&Notification.permission==='default') Notification.requestPermission();
