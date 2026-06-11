@@ -5,6 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Clientes Unisul</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+.leaflet-popup-content { font-family: 'Nunito', sans-serif; font-size: 13px; }
+.map-client-card { background:white;border-radius:12px;padding:11px 13px;margin-bottom:7px;box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;align-items:center;gap:10px;border-left:4px solid #e2eaf5;cursor:pointer; }
+.map-client-card.has-loc { border-left-color:#22c55e; }
+.map-client-card.no-loc  { border-left-color:#e2eaf5;opacity:.6; }
+.map-client-dot { width:32px;height:32px;border-radius:50%;background:#e2eaf5;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0; }
+.map-client-dot.has-loc { background:#dcfce7; }
+.map-client-info { flex:1;min-width:0; }
+.map-client-name { font-weight:800;font-size:12px;color:#1a1a2e;white-space:nowrap;overflow:hidden;text-overflow:ellipsis; }
+.map-client-sub  { font-size:11px;color:#6b7a99;margin-top:1px; }
+.map-week-btn { flex-shrink:0;padding:6px 12px;border-radius:20px;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;cursor:pointer;background:white;color:#6b7a99;box-shadow:0 1px 4px rgba(0,0,0,0.08); }
+.map-week-btn.active { background:#0f3460;color:white; }
+</style>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAxvebdXYT8QZ2l80Eny8qcY0pcnajedes",
+    authDomain: "representante-756ce.firebaseapp.com",
+    projectId: "representante-756ce",
+    storageBucket: "representante-756ce.firebasestorage.app",
+    messagingSenderId: "985874838084",
+    appId: "1:985874838084:web:bf38feaa9ea67184d6c9a1",
+    databaseURL: "https://representante-756ce-default-rtdb.firebaseio.com"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  window._fbDb = db;
+  window._fbRef = ref;
+  window._fbSet = set;
+  window._fbGet = get;
+  window._fbOnValue = onValue;
+  window._fbReady = true;
+  document.dispatchEvent(new Event('firebase-ready'));
+</script>
 <style>
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
 body { font-family:'Nunito',sans-serif; background:#eef2f7; min-height:100vh; padding:14px; }
@@ -276,6 +315,49 @@ input:focus,textarea:focus,select:focus{border-color:#1a6bbf;}
 .month-chip.active{background:#0f3460;color:white;}
 
 /* ══════════════════════════════════
+   LOCALIZAÇÃO BLOCK
+══════════════════════════════════ */
+.location-block {
+  background:#f0fdf4; border-radius:12px;
+  padding:11px 12px; margin-bottom:12px;
+  border:1.5px solid #bbf7d0;
+}
+.location-block-title {
+  font-size:11px; font-weight:900; color:#166534;
+  text-transform:uppercase; letter-spacing:1px;
+  margin-bottom:8px; display:flex; align-items:center; gap:6px;
+}
+.location-coords {
+  font-size:12px; font-weight:700; color:#166534;
+  background:white; border-radius:8px; padding:7px 10px;
+  margin-bottom:8px; border:1.5px solid #bbf7d0;
+  display:flex; align-items:center; gap:6px;
+}
+.location-coords.empty { color:#aab4c8; font-style:italic; }
+.location-btns { display:flex; gap:7px; }
+.btn-capturar-loc {
+  flex:1; padding:9px; border:none; border-radius:9px;
+  background:linear-gradient(135deg,#059669,#10b981);
+  color:white; font-family:'Nunito',sans-serif;
+  font-weight:900; font-size:12px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center; gap:5px;
+}
+.btn-capturar-loc:active { opacity:.85; }
+.btn-abrir-loc {
+  flex:1; padding:9px; border:none; border-radius:9px;
+  background:#4285F4; color:white;
+  font-family:'Nunito',sans-serif; font-weight:900;
+  font-size:12px; cursor:pointer; text-decoration:none;
+  display:flex; align-items:center; justify-content:center; gap:5px;
+}
+.btn-limpar-loc {
+  width:36px; padding:9px; border:none; border-radius:9px;
+  background:#fee2e2; color:#ef4444;
+  font-family:'Nunito',sans-serif; font-weight:900;
+  font-size:14px; cursor:pointer;
+}
+
+/* ══════════════════════════════════
    COMPRAS BLOCK — novo
 ══════════════════════════════════ */
 .compras-block {
@@ -366,6 +448,7 @@ input:focus,textarea:focus,select:focus{border-color:#1a6bbf;}
     ✅ Tarefas <span id="taskBadge" style="display:none;background:#ef4444;color:white;border-radius:10px;padding:1px 6px;font-size:10px;margin-left:2px"></span>
   </button>
   <button class="nav-btn" id="navStats" onclick="switchPage('stats')">📊 Stats</button>
+  <button class="nav-btn" id="navMapa" onclick="switchPage('mapa')">🗺️ Mapa</button>
 </div>
 
 <!-- ═══ PÁGINA CLIENTES ═══ -->
@@ -423,6 +506,29 @@ input:focus,textarea:focus,select:focus{border-color:#1a6bbf;}
     <div class="tasks-empty-text">Nenhuma tarefa ainda.<br>Toque no <strong>+</strong> para adicionar!</div>
   </div>
   <button class="task-fab" onclick="openTaskModal()">+</button>
+</div>
+
+<!-- ═══ PÁGINA MAPA ═══ -->
+<div class="page" id="pageMapa" style="padding-bottom:24px">
+  <div style="background:white;border-radius:12px;padding:10px 14px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.07);display:flex;align-items:center;gap:8px;">
+    <span style="font-size:16px">🗺️</span>
+    <div style="flex:1">
+      <div style="font-size:13px;font-weight:900;color:#0f3460">Mapa de Clientes</div>
+      <div style="font-size:11px;color:#6b7a99" id="mapaSubtitle">Clientes com localização salva</div>
+    </div>
+    <div style="display:flex;gap:6px;">
+      <button onclick="filterMapaWeek(-1)" id="mbtn-all" style="padding:5px 10px;border-radius:20px;border:none;font-family:'Nunito',sans-serif;font-weight:800;font-size:11px;cursor:pointer;background:#0f3460;color:white;">Todos</button>
+    </div>
+  </div>
+  <div id="mapaWeekFilter" style="display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;"></div>
+  <div id="mapaContainer" style="border-radius:16px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.12);background:#e8f4f8;min-height:400px;position:relative;">
+    <div id="mapaPlaceholder" style="text-align:center;padding:60px 20px;color:#6b7a99;">
+      <div style="font-size:48px;margin-bottom:12px">🗺️</div>
+      <div style="font-weight:800;font-size:14px">Carregando mapa...</div>
+    </div>
+    <div id="map" style="width:100%;height:500px;display:none;"></div>
+  </div>
+  <div id="mapaClientesList" style="margin-top:12px;"></div>
 </div>
 
 <!-- ═══ PÁGINA STATS ═══ -->
@@ -740,6 +846,7 @@ function getHistoricoCompras(clienteId) {
 }
 function saveHistoricoCompras(clienteId, hist) {
   localStorage.setItem('compras_' + clienteId, JSON.stringify(hist));
+  saveComprasToCloud(clienteId);
 }
 function slugM(str) { return str.toLowerCase().replace(/[^a-z0-9]/g,'_'); }
 
@@ -751,11 +858,68 @@ function loadData() {
   try { tasks         = JSON.parse(localStorage.getItem('unisul_tasks')   ||'[]'); } catch(e){ tasks=[]; }
 }
 function savePersist() {
+  // Salva local sempre
   localStorage.setItem('unisul_cdata',   JSON.stringify(clientData));
   localStorage.setItem('unisul_custom',  JSON.stringify(customClients));
   localStorage.setItem('unisul_disabled',JSON.stringify([...disabledIds]));
   localStorage.setItem('unisul_visits',  JSON.stringify(visitData));
   localStorage.setItem('unisul_tasks',   JSON.stringify(tasks));
+  // Salva na nuvem
+  saveToCloud();
+}
+
+function saveToCloud() {
+  if(!window._fbDb) return;
+  try {
+    const payload = {
+      cdata:    clientData,
+      custom:   customClients,
+      disabled: [...disabledIds],
+      visits:   visitData,
+      tasks:    tasks,
+      ts:       Date.now()
+    };
+    window._fbSet(window._fbRef(window._fbDb, 'unisul/data'), payload)
+      .catch(e => console.warn('Firebase save error:', e));
+  } catch(e) { console.warn('Firebase error:', e); }
+}
+
+function saveComprasToCloud(clienteId) {
+  if(!window._fbDb) return;
+  try {
+    const hist = getHistoricoCompras(clienteId);
+    window._fbSet(window._fbRef(window._fbDb, 'unisul/compras/' + clienteId), hist)
+      .catch(e => console.warn('Firebase compras error:', e));
+  } catch(e) {}
+}
+
+function loadFromCloud(callback) {
+  if(!window._fbDb) { callback(false); return; }
+  window._fbGet(window._fbRef(window._fbDb, 'unisul/data')).then(snapshot => {
+    if(snapshot.exists()) {
+      const d = snapshot.val();
+      if(d.cdata)    { clientData    = d.cdata;    localStorage.setItem('unisul_cdata',   JSON.stringify(d.cdata)); }
+      if(d.custom)   { customClients = d.custom;   localStorage.setItem('unisul_custom',  JSON.stringify(d.custom)); }
+      if(d.disabled) { disabledIds   = new Set(d.disabled); localStorage.setItem('unisul_disabled',JSON.stringify(d.disabled)); }
+      if(d.visits)   { visitData     = d.visits;   localStorage.setItem('unisul_visits',  JSON.stringify(d.visits)); }
+      if(d.tasks)    { tasks         = d.tasks;    localStorage.setItem('unisul_tasks',   JSON.stringify(d.tasks)); }
+      console.log('✅ Dados carregados da nuvem!');
+      callback(true);
+    } else { callback(false); }
+  }).catch(e => { console.warn('Firebase load error:', e); callback(false); });
+}
+
+function loadComprasFromCloud(callback) {
+  if(!window._fbDb) { callback(); return; }
+  window._fbGet(window._fbRef(window._fbDb, 'unisul/compras')).then(snapshot => {
+    if(snapshot.exists()) {
+      const compras = snapshot.val();
+      Object.entries(compras).forEach(([cid, hist]) => {
+        localStorage.setItem('compras_' + cid, JSON.stringify(hist));
+      });
+    }
+    callback();
+  }).catch(e => { callback(); });
 }
 
 function getC(id,key,def='') { return (clientData[id]||{})[key] ?? def; }
@@ -796,6 +960,7 @@ function switchPage(page) {
   document.getElementById('clientFab').style.display = page==='clientes'?'flex':'none';
   if(page==='tarefas') renderTasks();
   if(page==='stats')   renderStats();
+  if(page==='mapa')    renderMapa();
 }
 function changeMonth(delta) {
   viewMonth += delta;
@@ -921,6 +1086,9 @@ function renderClientCard(c, num, isDisabled) {
 
   // badge compras
   const hist = getHistoricoCompras(c.id);
+  const locBadge = getC(c.id,'lat','')
+    ? `<span class="badge" style="background:#dcfce7;color:#166534;">📍</span>`
+    : '';
   const compBadge = hist.length > 0
     ? `<span class="badge" style="background:#fff0e0;color:#ea580c;">🛒 ${hist.length}</span>`
     : '';
@@ -935,6 +1103,7 @@ function renderClientCard(c, num, isDisabled) {
       <div class="badges">
         ${isNew?`<span class="badge badge-novo">🆕</span>`:''}
         ${isDisabled?`<span class="badge badge-disabled">Inativo</span>`:vBadge}
+        ${locBadge}
         ${compBadge}
         ${phone?`<span class="badge badge-phone">📞</span>`:''}
       </div>
@@ -949,6 +1118,7 @@ function renderClientCard(c, num, isDisabled) {
 
       ${!isDisabled ? `
       ${renderVisitsBlock(c.id, prog)}
+      ${renderLocationBlock(c.id)}
       ${renderComprasBlock(c.id)}
 
       <div class="field-group">
@@ -990,6 +1160,73 @@ function renderClientCard(c, num, isDisabled) {
 // ═══════════════════════════════════════
 //  COMPRAS BLOCK
 // ═══════════════════════════════════════
+function renderLocationBlock(clienteId) {
+  const lat = getC(clienteId,'lat','');
+  const lng = getC(clienteId,'lng','');
+  const hasLoc = lat && lng;
+  const mapsUrl = hasLoc
+    ? `https://www.google.com/maps?q=${lat},${lng}`
+    : '';
+
+  return `<div class="location-block" id="locblock-${clienteId}">
+    <div class="location-block-title">📍 Localização Fixa</div>
+    <div class="location-coords ${hasLoc?'':'empty'}" id="loccoords-${clienteId}">
+      ${hasLoc
+        ? `📌 ${parseFloat(lat).toFixed(5)}, ${parseFloat(lng).toFixed(5)}`
+        : 'Nenhuma localização salva'}
+    </div>
+    <div class="location-btns">
+      <button class="btn-capturar-loc" onclick="capturarLocalizacao(${clienteId})">
+        📍 Capturar Agora
+      </button>
+      ${hasLoc
+        ? `<a class="btn-abrir-loc" href="${mapsUrl}" target="_blank">🗺️ Abrir</a>
+           <button class="btn-limpar-loc" onclick="limparLocalizacao(${clienteId})">🗑</button>`
+        : ''}
+    </div>
+  </div>`;
+}
+
+function capturarLocalizacao(clienteId) {
+  const btn = document.querySelector(`#locblock-${clienteId} .btn-capturar-loc`);
+  if(btn) { btn.textContent = '⏳ Capturando...'; btn.disabled = true; }
+
+  if(!navigator.geolocation) {
+    alert('GPS não disponível neste dispositivo.');
+    if(btn) { btn.textContent = '📍 Capturar Agora'; btn.disabled = false; }
+    return;
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    (pos) => {
+      const lat = pos.coords.latitude;
+      const lng = pos.coords.longitude;
+      setC(clienteId, 'lat', lat.toString());
+      setC(clienteId, 'lng', lng.toString());
+      savePersist();
+      // Re-render só o bloco de localização
+      const block = document.getElementById('locblock-' + clienteId);
+      if(block) block.outerHTML = renderLocationBlock(clienteId);
+      showToastMsg('📍 Localização salva!');
+    },
+    (err) => {
+      alert('Erro ao capturar localização. Verifique o GPS e permissões.');
+      if(btn) { btn.textContent = '📍 Capturar Agora'; btn.disabled = false; }
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function limparLocalizacao(clienteId) {
+  if(!confirm('Remover localização salva?')) return;
+  setC(clienteId, 'lat', '');
+  setC(clienteId, 'lng', '');
+  savePersist();
+  const block = document.getElementById('locblock-' + clienteId);
+  if(block) block.outerHTML = renderLocationBlock(clienteId);
+  showToastMsg('🗑 Localização removida.');
+}
+
 function renderComprasBlock(clienteId) {
   const sel = comprasSel[clienteId] || new Set();
   const hist = getHistoricoCompras(clienteId);
@@ -1502,190 +1739,4 @@ function calcStatsForMonth(mk) {
     if(cVendeu) clientesComVenda++;
   });
   const taxaVisita = totalVisitas>0 ? Math.round(visitasFeitas/totalVisitas*100) : 0;
-  return {clients, totalVendas, clientesComVenda, totalVisitas, visitasFeitas,
-          taxaVisita, semVenda, ausente, retornar, recusou};
-}
-
-function renderStats() {
-  const mk = statsMonthKey(statsMonthOffset);
-  const s  = calcStatsForMonth(mk);
-  const clients = allClients().filter(c=>!disabledIds.has(c.id));
-  const fmt = v => 'R$ '+v.toLocaleString('pt-BR',{minimumFractionDigits:2,maximumFractionDigits:2});
-
-  const taxaV = s.visitasFeitas+'/'+s.totalVisitas;
-  const kpiHtml = `
-  <div class="stats-section">
-    <div class="stats-section-title">⚡ Resumo — ${statsMonthLabel(statsMonthOffset)}</div>
-    <div class="kpi-grid">
-      <div class="kpi-card green"><div class="kpi-num">${fmt(s.totalVendas)}</div><div class="kpi-lbl">Total em Vendas</div></div>
-      <div class="kpi-card blue"><div class="kpi-num">${s.clientesComVenda}</div><div class="kpi-lbl">Clientes que Compraram</div></div>
-      <div class="kpi-card amber"><div class="kpi-num">${taxaV}</div><div class="kpi-lbl">Visitas Realizadas</div></div>
-      <div class="kpi-card purple"><div class="kpi-num">${s.taxaVisita}%</div><div class="kpi-lbl">Taxa de Visitas</div></div>
-    </div>
-  </div>`;
-
-  const pendentes = s.totalVisitas - s.visitasFeitas;
-  const maxVP = s.totalVisitas || 1;
-  const visitasHtml = `
-  <div class="stats-section">
-    <div class="stats-section-title">📊 Visitas Realizadas vs Pendentes</div>
-    <div class="bar-chart">
-      <div class="bar-row">
-        <div class="bar-label">Feitas</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${s.visitasFeitas/maxVP*100}%;background:linear-gradient(90deg,#22c55e,#16a34a)">${s.visitasFeitas}</div></div>
-        <div class="bar-value">${Math.round(s.visitasFeitas/maxVP*100)}%</div>
-      </div>
-      <div class="bar-row">
-        <div class="bar-label">Pendentes</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${pendentes/maxVP*100}%;background:linear-gradient(90deg,#94a3b8,#64748b)">${pendentes}</div></div>
-        <div class="bar-value">${Math.round(pendentes/maxVP*100)}%</div>
-      </div>
-    </div>
-    <div style="margin-top:14px;">
-      ${[
-        {lbl:'💰 Vendeu',    val:s.clients.filter(c=>{const v1=getVisitForMonth(c.id,1,mk),v2=getVisitForMonth(c.id,2,mk);return v1.status==='vendeu'||v2.status==='vendeu';}).length, color:'#22c55e'},
-        {lbl:'📋 Sem Venda', val:s.semVenda,  color:'#f59e0b'},
-        {lbl:'❌ Ausente',   val:s.ausente,   color:'#ef4444'},
-        {lbl:'🔄 Retornar',  val:s.retornar,  color:'#3b82f6'},
-        {lbl:'🚫 Recusou',   val:s.recusou,   color:'#8b5cf6'},
-      ].map(r=>`
-        <div class="taxa-row">
-          <div class="taxa-lbl">${r.lbl}
-            <span class="taxa-bar-mini"><span class="taxa-bar-fill" style="width:${s.visitasFeitas>0?Math.round(r.val/s.visitasFeitas*100):0}%;background:${r.color}"></span></span>
-          </div>
-          <div class="taxa-val">${r.val} <span style="font-size:10px;color:#94a3b8">(${s.visitasFeitas>0?Math.round(r.val/s.visitasFeitas*100):0}%)</span></div>
-        </div>`).join('')}
-    </div>
-  </div>`;
-
-  // Top marcas mais compradas
-  const marcaCount = {};
-  [...MARCAS_PG, ...MARCAS_HK].forEach(m => marcaCount[m] = 0);
-  clients.forEach(c => {
-    getHistoricoCompras(c.id).forEach(v => {
-      v.marcas.forEach(m => { if(marcaCount[m]!==undefined) marcaCount[m]++; });
-    });
-  });
-  const topMarcas = Object.entries(marcaCount).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const maxMarca = topMarcas.length ? topMarcas[0][1] : 1;
-  const marcasHtml = `
-  <div class="stats-section">
-    <div class="stats-section-title">🛒 Marcas Mais Compradas</div>
-    ${topMarcas.length === 0 ? '<div class="empty-msg">Nenhuma compra registrada ainda.</div>' : `
-    <div class="bar-chart">
-      ${topMarcas.map(([m,v])=>`
-      <div class="bar-row">
-        <div class="bar-label" style="font-size:10px">${m.length>8?m.slice(0,8)+'…':m}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${v/maxMarca*100}%;background:linear-gradient(90deg,#ea580c,#f97316)">${v}</div></div>
-        <div class="bar-value">${v}x</div>
-      </div>`).join('')}
-    </div>`}
-  </div>`;
-
-  const vendasPorSemana = SEMANAS.map((s,si)=>{
-    let total=0, count=0;
-    clients.forEach(c=>{
-      const weeks=clientWeeks(c.id);
-      if(!weeks.includes(si)) return;
-      [1,2].forEach(n=>{
-        const v=getVisitForMonth(c.id,n,mk);
-        if(v.status==='vendeu'){
-          total+=parseFloat(String(v.valor||'0').replace(',','.'))||0;
-          count++;
-        }
-      });
-    });
-    return {sem:s, total, count};
-  });
-  const maxVenda = Math.max(...vendasPorSemana.map(v=>v.total), 1);
-  const vendasDiaHtml = `
-  <div class="stats-section">
-    <div class="stats-section-title">💰 Vendas por Semana</div>
-    <div class="bar-chart">
-      ${vendasPorSemana.map((v,i)=>`
-      <div class="bar-row">
-        <div class="bar-label" style="font-size:10px">${v.sem}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${v.total/maxVenda*100}%;background:${SEMANA_COLORS[i]}">${v.count>0?v.count+'x':''}</div></div>
-        <div class="bar-value" style="font-size:10px">${v.total>0?'R$'+v.total.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}):'—'}</div>
-      </div>`).join('')}
-    </div>
-  </div>`;
-
-  const ranking = clients.map(c=>{
-    let total=0, visitas=0;
-    for(let mo=0;mo>=-5;mo--){
-      const mmk=statsMonthKey(mo);
-      [1,2].forEach(n=>{
-        const v=getVisitForMonth(c.id,n,mmk);
-        if(v.status==='vendeu'){
-          total+=parseFloat(String(v.valor||'0').replace(',','.'))||0;
-          visitas++;
-        }
-      });
-    }
-    return {c, total, visitas};
-  }).filter(x=>x.total>0).sort((a,b)=>b.total-a.total).slice(0,10);
-  const medals = ['🥇','🥈','🥉'];
-  const rankHtml = `
-  <div class="stats-section">
-    <div class="stats-section-title">🏆 Top Clientes (últimos 6 meses)</div>
-    ${ranking.length===0?'<div class="empty-msg">Nenhuma venda registrada ainda.</div>':''}
-    <div class="rank-list">
-      ${ranking.map((r,i)=>`
-      <div class="rank-item ${i<3?'rank-'+(i+1):''}">
-        <div class="rank-pos">${i<3?medals[i]:'#'+(i+1)}</div>
-        <div class="rank-info">
-          <div class="rank-name">${r.c.name}</div>
-          <div class="rank-sub">${r.c.city} · ${r.visitas} venda${r.visitas!==1?'s':''}</div>
-        </div>
-        <div class="rank-val">${fmt(r.total)}</div>
-      </div>`).join('')}
-    </div>
-  </div>`;
-
-  const evolucao = [];
-  for(let mo=-5;mo<=0;mo++){
-    const emk=statsMonthKey(mo);
-    let total=0;
-    clients.forEach(c=>{
-      [1,2].forEach(n=>{
-        const v=getVisitForMonth(c.id,n,emk);
-        if(v.status==='vendeu') total+=parseFloat(String(v.valor||'0').replace(',','.'))||0;
-      });
-    });
-    evolucao.push({label:statsMonthLabel(mo).slice(0,8), total, mk:emk});
-  }
-  const maxEvo = Math.max(...evolucao.map(e=>e.total),1);
-  const evoHtml = `
-  <div class="stats-section">
-    <div class="stats-section-title">📅 Evolução Mensal de Vendas</div>
-    <div class="bar-chart">
-      ${evolucao.map((e)=>`
-      <div class="bar-row">
-        <div class="bar-label" style="font-size:10px">${e.label}</div>
-        <div class="bar-track"><div class="bar-fill" style="width:${e.total/maxEvo*100}%;background:${e.mk===statsMonthKey(0)?'linear-gradient(90deg,#0f3460,#1a6bbf)':'linear-gradient(90deg,#7c3aed,#a78bfa)'}">${e.total>0?'R$'+e.total.toLocaleString('pt-BR',{minimumFractionDigits:0,maximumFractionDigits:0}):''}</div></div>
-        <div class="bar-value" style="font-size:10px">${e.total>0?'R$'+e.total.toLocaleString('pt-BR',{maximumFractionDigits:0}):'R$ 0'}</div>
-      </div>`).join('')}
-    </div>
-  </div>`;
-
-  document.getElementById('statsContent').innerHTML = kpiHtml + visitasHtml + marcasHtml + vendasDiaHtml + evoHtml + rankHtml;
-}
-
-// ═══════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════
-loadData();
-updateMonthLabel();
-const d=new Date();
-document.getElementById('headerSub').textContent=
-  d.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long'}).replace(/^\w/,x=>x.toUpperCase());
-
-weekFilter = currentWeekIndex();
-
-buildDayTabs(); populateClientSelect(); renderAll(); renderTasks(); updateTaskBadge(); scheduleAllAlarms();
-if(window.Notification&&Notification.permission==='default') Notification.requestPermission();
-document.getElementById('clientFab').style.display='flex';
-</script>
-</body>
-</html>
+  return {clients, totalVendas, clientesComVenda, totalVisitas, vis
