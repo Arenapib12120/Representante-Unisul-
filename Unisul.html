@@ -20,29 +20,28 @@
 .map-week-btn { flex-shrink:0;padding:6px 12px;border-radius:20px;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;cursor:pointer;background:white;color:#6b7a99;box-shadow:0 1px 4px rgba(0,0,0,0.08); }
 .map-week-btn.active { background:#0f3460;color:white; }
 </style>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
+<!-- Firebase compat -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script>
   const firebaseConfig = {
     apiKey: "AIzaSyAxvebdXYT8QZ2l80Eny8qcY0pcnajedes",
     authDomain: "representante-756ce.firebaseapp.com",
+    databaseURL: "https://representante-756ce-default-rtdb.firebaseio.com",
     projectId: "representante-756ce",
     storageBucket: "representante-756ce.firebasestorage.app",
     messagingSenderId: "985874838084",
-    appId: "1:985874838084:web:bf38feaa9ea67184d6c9a1",
-    databaseURL: "https://representante-756ce-default-rtdb.firebaseio.com"
+    appId: "1:985874838084:web:bf38feaa9ea67184d6c9a1"
   };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  window._fbDb = db;
-  window._fbRef = ref;
-  window._fbSet = set;
-  window._fbGet = get;
-  window._fbOnValue = onValue;
-  window._fbReady = true;
-  document.dispatchEvent(new Event('firebase-ready'));
+  try {
+    firebase.initializeApp(firebaseConfig);
+    window._fbDb = firebase.database();
+    window._fbReady = true;
+    document.dispatchEvent(new Event('firebase-ready'));
+    console.log('✅ Firebase conectado!');
+  } catch(e) {
+    console.warn('Firebase erro:', e);
+  }
 </script>
 <style>
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
@@ -879,7 +878,7 @@ function saveToCloud() {
       tasks:    tasks,
       ts:       Date.now()
     };
-    window._fbSet(window._fbRef(window._fbDb, 'unisul/data'), payload)
+    window._fbDb.ref('unisul/data').set(payload)
       .catch(e => console.warn('Firebase save error:', e));
   } catch(e) { console.warn('Firebase error:', e); }
 }
@@ -888,14 +887,14 @@ function saveComprasToCloud(clienteId) {
   if(!window._fbDb) return;
   try {
     const hist = getHistoricoCompras(clienteId);
-    window._fbSet(window._fbRef(window._fbDb, 'unisul/compras/' + clienteId), hist)
+    window._fbDb.ref('unisul/compras/' + clienteId).set(hist)
       .catch(e => console.warn('Firebase compras error:', e));
   } catch(e) {}
 }
 
 function loadFromCloud(callback) {
   if(!window._fbDb) { callback(false); return; }
-  window._fbGet(window._fbRef(window._fbDb, 'unisul/data')).then(snapshot => {
+  window._fbDb.ref('unisul/data').once('value').then(snapshot => {
     if(snapshot.exists()) {
       const d = snapshot.val();
       if(d.cdata)    { clientData    = d.cdata;    localStorage.setItem('unisul_cdata',   JSON.stringify(d.cdata)); }
@@ -911,7 +910,7 @@ function loadFromCloud(callback) {
 
 function loadComprasFromCloud(callback) {
   if(!window._fbDb) { callback(); return; }
-  window._fbGet(window._fbRef(window._fbDb, 'unisul/compras')).then(snapshot => {
+  window._fbDb.ref('unisul/compras').once('value').then(snapshot => {
     if(snapshot.exists()) {
       const compras = snapshot.val();
       Object.entries(compras).forEach(([cid, hist]) => {
@@ -1739,4 +1738,8 @@ function calcStatsForMonth(mk) {
     if(cVendeu) clientesComVenda++;
   });
   const taxaVisita = totalVisitas>0 ? Math.round(visitasFeitas/totalVisitas*100) : 0;
-  return {clients, totalVendas, clientesComVenda, totalVisitas, vis
+  return {clients, totalVendas, clientesComVenda, totalVisitas, visitasFeitas,
+          taxaVisita, semVenda, ausente, retornar, recusou};
+}
+
+// ═════════════
