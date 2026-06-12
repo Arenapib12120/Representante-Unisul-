@@ -20,28 +20,44 @@
 .map-week-btn { flex-shrink:0;padding:6px 12px;border-radius:20px;border:none;font-family:'Nunito',sans-serif;font-weight:700;font-size:11px;cursor:pointer;background:white;color:#6b7a99;box-shadow:0 1px 4px rgba(0,0,0,0.08); }
 .map-week-btn.active { background:#0f3460;color:white; }
 </style>
-<!-- Firebase compat -->
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<!-- Firebase — carrega em background, nunca bloqueia o app -->
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyAxvebdXYT8QZ2l80Eny8qcY0pcnajedes",
-    authDomain: "representante-756ce.firebaseapp.com",
-    databaseURL: "https://representante-756ce-default-rtdb.firebaseio.com",
-    projectId: "representante-756ce",
-    storageBucket: "representante-756ce.firebasestorage.app",
-    messagingSenderId: "985874838084",
-    appId: "1:985874838084:web:bf38feaa9ea67184d6c9a1"
-  };
+window._fbReady = false;
+window._fbDb = null;
+function _initFirebase() {
   try {
-    firebase.initializeApp(firebaseConfig);
-    window._fbDb = firebase.database();
-    window._fbReady = true;
-    document.dispatchEvent(new Event('firebase-ready'));
-    console.log('✅ Firebase conectado!');
-  } catch(e) {
-    console.warn('Firebase erro:', e);
-  }
+    const s1 = document.createElement('script');
+    s1.src = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js';
+    s1.onload = function() {
+      const s2 = document.createElement('script');
+      s2.src = 'https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js';
+      s2.onload = function() {
+        try {
+          firebase.initializeApp({
+            apiKey: "AIzaSyAxvebdXYT8QZ2l80Eny8qcY0pcnajedes",
+            authDomain: "representante-756ce.firebaseapp.com",
+            databaseURL: "https://representante-756ce-default-rtdb.firebaseio.com",
+            projectId: "representante-756ce",
+            storageBucket: "representante-756ce.firebasestorage.app",
+            messagingSenderId: "985874838084",
+            appId: "1:985874838084:web:bf38feaa9ea67184d6c9a1"
+          });
+          window._fbDb = firebase.database();
+          window._fbReady = true;
+          console.log('✅ Firebase conectado!');
+          // Sincroniza após conectar
+          if(typeof trySyncCloud === 'function') trySyncCloud();
+        } catch(e) { console.warn('Firebase init erro:', e); }
+      };
+      s2.onerror = function() { console.warn('Firebase database script falhou'); };
+      document.head.appendChild(s2);
+    };
+    s1.onerror = function() { console.warn('Firebase app script falhou'); };
+    document.head.appendChild(s1);
+  } catch(e) { console.warn('Firebase load erro:', e); }
+}
+// Carrega Firebase após o app já estar pronto
+window.addEventListener('load', function() { setTimeout(_initFirebase, 1000); });
 </script>
 <style>
 * { box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
@@ -1718,28 +1734,4 @@ function getVisitForMonth(id, n, mk) { return visitData[`${id}-${mk}-${n}`] || {
 function calcStatsForMonth(mk) {
   const clients = allClients().filter(c=>!disabledIds.has(c.id));
   let totalVendas=0, clientesComVenda=0, totalVisitas=0, visitasFeitas=0;
-  let semVenda=0, ausente=0, retornar=0, recusou=0;
-  clients.forEach(c=>{
-    let cVendeu=false;
-    [1,2].forEach(n=>{
-      const v = getVisitForMonth(c.id, n, mk);
-      totalVisitas++;
-      if(v.status){ visitasFeitas++; }
-      if(v.status==='vendeu'){
-        cVendeu=true;
-        const val=parseFloat(String(v.valor||'0').replace(',','.'))||0;
-        totalVendas+=val;
-      }
-      if(v.status==='semvenda') semVenda++;
-      if(v.status==='ausente')  ausente++;
-      if(v.status==='retornar') retornar++;
-      if(v.status==='recusou')  recusou++;
-    });
-    if(cVendeu) clientesComVenda++;
-  });
-  const taxaVisita = totalVisitas>0 ? Math.round(visitasFeitas/totalVisitas*100) : 0;
-  return {clients, totalVendas, clientesComVenda, totalVisitas, visitasFeitas,
-          taxaVisita, semVenda, ausente, retornar, recusou};
-}
-
-// ═════════════
+  let semVenda=0, ausente=0, retornar=0, recusou=0
