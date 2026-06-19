@@ -766,7 +766,21 @@ function loadFromCloud(cb){
   }).catch(()=>cb(false));
 }
 function trySyncCloud(){
-  loadFromCloud(ok=>{if(ok){renderAll();renderTasks();updateTaskBadge();}});
+  // Fallback: se Firebase demorar mais de 5s, carrega do localStorage mesmo assim
+  const fallback=setTimeout(()=>{
+    console.log('⚠️ Firebase timeout — carregando dados locais');
+    renderAll();renderTasks();updateTaskBadge();
+    document.getElementById('headerSub').textContent='Dados locais (sem conexão)';
+  },5000);
+  loadFromCloud(ok=>{
+    clearTimeout(fallback);
+    renderAll();renderTasks();updateTaskBadge();
+    if(ok){
+      document.getElementById('headerSub').textContent='✅ Sincronizado com a nuvem';
+    }else{
+      document.getElementById('headerSub').textContent='Dados locais';
+    }
+  });
 }
 
 function getC(id,key,def=''){return(clientData[id]||{})[key]??def;}
@@ -1344,14 +1358,4 @@ function renderStats(){
         if(v.status==='recusou')recusou++;
         if(v.status==='encontrado')encontrado++;
       }
-    });
-    if(hasVenda(c.id))comVenda++;
-  });
-  const tv=totalVendas();
-  const taxaV=totalVisitas>0?Math.round(totalV/totalVisitas*100):0;
-  document.getElementById('statsContent').innerHTML=`
-    <div class="stats-section">
-      <div class="stats-section-title">📊 ${MONTHS_PT[viewMonth]} ${viewYear}</div>
-      <div class="kpi-grid">
-        <div class="kpi-card green"><div class="kpi-num">${comVenda}</div><div class="kpi-lbl">Clientes com Venda</div></div>
-        <div class="kpi-card amber"><div class="kpi-num">${clients.length-co
+    
